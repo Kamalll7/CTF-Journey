@@ -1,2 +1,2 @@
 # CTF-Journey
-Catatan, contoh soal, dan solusi dari soal soal CTF.
+Gexexer qirkirem tvskviww fipenev GXJ, Tiqfelewer wsep cerk wece wipiwemoer, her wspywm hevm wsep wsep osqtixmwm (gsqmrk wssr).
