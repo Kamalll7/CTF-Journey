@@ -6,110 +6,81 @@
 ## Super SSH
 > Gunakan SSH user@host -p port
 
-Apa itu SSH?
-SSH (Secure Shell) adalah protokol jaringan untuk mengakses dan mengelola komputer/server jarak jauh secara aman. 
-SSH menyediakan koneksi terenkripsi sehingga kredensial dan data tidak dikirim dalam bentuk teks biasa. 
-Biasanya dipakai untuk remote shell, transfer file, dan tunneling port.
-
-Format dasar
-ssh user@host -p port
-
-user > nama user di mesin remote (contoh: ubuntu, root, kali).
-
-host > alamat IP atau domain mesin remote (contoh: 192.168.1.10 atau example.com).
-
--p port → port SSH pada mesin remote (default SSH = 22). Jika server menggunakan port lain, pakai -p.
-
-Contoh:
-
-ssh kali@203.0.113.5 -p 2222
-
-Opsi SSH yang sering dipakai
--p <port> : tentukan port SSH (contoh: -p 2222).
--i /path/to/key : pakai private key tertentu (contoh: -i ~/.ssh/id_rsa_ctf).
--v, -vv, -vvv : verbose mode (debug; bagus untuk troubleshooting).
--C : aktifkan compression.
--o Option=Value : set opsi konfigurasi satu baris (mis. -o StrictHostKeyChecking=no).
-
-Contoh pakai key dan verbose:
-ssh -i ~/.ssh/id_rsa -v kali@203.0.113.5 -p 2222
-
-Autentikasi: password vs key-based (disarankan)
-1. Password (default)
-
-SSH akan minta password user remote.
-
-2. Key-based (lebih aman & praktis)
-
-Langkah singkat:
-# 1) buat key di lokal (jika belum)
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_ctf -C "kali@laptop"
-
-# 2) copy public key ke remote (pakai port jika non-22)
-ssh-copy-id -i ~/.ssh/id_rsa_ctf.pub -p 2222 kali@203.0.113.5
-# atau manual:
-ssh -p 2222 ucok@203.0.113.5 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys' < ~/.ssh/id_rsa_ctf.pub
-
-Setelah ini, login:
-ssh -i ~/.ssh/id_rsa_ctf kali@203.0.113.5 -p 2222
-
-Catatan: pastikan permission:
-~/.ssh = 700
-~/.ssh/authorized_keys = 600
-
-SSH config (mempermudah)
-Isi file ~/.ssh/config untuk menyimpan opsi supaya tidak repot menulis -p dan -i tiap kali:
-Host myserver
-    HostName 203.0.113.5
-    User kali
-    Port 2222
-    IdentityFile ~/.ssh/id_rsa_ctf
-    ServerAliveInterval 60
-
-Lalu cukup:
-ssh myserver
-Transfer file
-scp (secure copy)
-
-Perlu ingat: scp pakai -P (huruf besar) untuk port.
-
-# upload file ke server
-scp -P 2222 file.txt ucok@203.0.113.5:/home/kali/
-
-# download dari server
-scp -P 2222 kali@203.0.113.5:/home/ucok/flag.txt .
-
-sftp (interactive)
-sftp -P 2222 kali@203.0.113.5
-
-Port forwarding / tunneling (sangat berguna di CTF)
-Local port forwarding (akses service remote lewat port lokal)
-ssh -L <local_port>:<target_host>:<target_port> user@bastion -p <port>
-
-
-Contoh: akses web server internal 10.0.0.5:80 lewat localhost:8080:
-ssh -L 8080:10.0.0.5:80 kali@203.0.113.5 -p 2222
-# lalu buka http://localhost:8080 di browser
-
-Remote port forwarding (buat expose local ke remote)
-ssh -R <remote_port>:<local_host>:<local_port> user@remote -p <port>
-
-Dynamic port forwarding (SOCKS proxy)
-ssh -D 1080 ucok@203.0.113.5 -p 2222
-# lalu atur browser pakai SOCKS5 proxy localhost:1080
-
-Jump host / ProxyJump (mengakses host di private network)
-# langsung via bastion
-ssh -J bastionuser@bastion.example.com:2222 targetuser@10.0.0.5
-
-
-Atau di ~/.ssh/config:
-
-Host target
-    HostName 10.0.0.5
-    User targetuser
-    ProxyJump bastionuser@bastion.example.com:2222
-
-
 ## Netcat
+> Gunakan nc host port
+
+# **Section 2 (CyberChef)
+
+## Mod 26
+    ROT13 (Rotate by 13 places) adalah metode sederhana untuk menyandikan teks dengan cara menggeser setiap huruf alfabet sebanyak 13 posisi.
+A menjadi N, B menjadi O, C menjadi P, …, N menjadi A, dan seterusnya.
+ROT13 bersifat simetris, artinya jika menerapkan ROT13 dua kali, teksnya akan kembali seperti semula.
+
+> Gunakan echo "(kode)" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+## Warmed up
+    base 16 adalah sistem bilangan yang menggunakan 16 simbol: angka 0-9 dan huruf A-F, di mana A hingga F mewakili nilai desimal 10 hingga 15. 
+Diketahui kode : 0x3D 
+Bagian 0x menandakan basis 16, dan 3D adalah flag yang terenkripsi. Cara membaca basis 16 -> perlu mengalikan setiap digit dengan pangkat 16 yang sesuai, dimulai dari kanan dengan pangkat 0. 
+Dimiliki angka 3 dan D.
+
+Mulai dari kanan (D) > D dalam heksadesimal melambangkan 13, karena paling kanan mulai dari 16^0, maka 13 * 16^0 = 13.
+Untuk bagian (3), karena dia berada di posisi ke-2, maka 3 * 16^1 = 48.
+Hasilnya (3D) > 13 + 48 = 61.
+Flag adalah PicoCTF{61}
+
+Menggunakan command > echo "ibase=16; 3D" | bc
+[echo] berguna untuk menampilkan string. 
+["ibase=16; 3D"] menampilkan bahwa base kode ini adalah heksadesimal dan kodenya adalah 3D.
+[|] mengirim echo tadi ke bc untuk diproses.
+[bc] perintah untuk kalkulator command-line di Linux/Unix yang bisa melakukan operasi aritmetika dan konversi antar basis bilangan.
+
+## 2Warm
+
+    Diperintahkan untuk mengkonversi bilangan decimal ke bilangan biner (base 2). 
+Cara manual > gambar kotak kotak dari kanan ke kiri dengan kotak pertama bernilai 1, kotak kedua bernilai 2, kotak ketiga bernilai 4 dan seterusnya (pangkat 2).
+Setiap kotak yang memiliki parameter 1 didalamnya berarti mengandung nilai yang tadi ditulis (semisal kotak bernilai 4 memiliki parameter 1 di dalamnya, berarti kotak itu [1] [0] [0] bernilai 4 dalam decimal).
+Gambar kotak kotak hingga mencapai nilai yang diinginkan dan ubah parameter ke 1 atau 0 untuk mencari nilai yang pas.
+
+Menggunakan command > echo "obase=2; 42" | bc
+obase digunakan untuk konversi angka dari base standar ke base tujuan. Sedangkan ibase digunakan untuk mengkonversi angka dari base didalam ibase ke base standar.
+
+## Bases
+
+    Diberikan string bDNhcm5fdGgzX3IwcDM1. Hint-nya adalah berkaitan dengan bases. Kita tahu bahwa base yang menggunakan hingga huruf x dan z adalah base 64. 
+Command > echo "bDNhcm5fdGgzX3IwcDM1" | base64 --decode
+
+
+# **Section 3**
+
+## Wave a flag
+    Diberikan sebuah file bernama warm. 
+Download menggunakan command > wget https://mercury.picoctf.net/static/fc1d77192c544314efece5dd309092e3/warm
+Saat langsung dijalankan dengan ./warm, maka akan terdapat notifikasi Permission denied.  Terjadi karena file warm tidak memiliki izin untuk execute (x). (lihat izin apa saja yang ada dengan ls -l warm).
+Untuk bisa meng-execute, kita perlu membuat izin execute dengan command > chmod +x warm
+(chmod) singkatan dari change mod, berguna untuk mengubah permission atau izin akses dari suatu file atau direktori di sistem linux.
+(+x warm) berarti kita menambahkan izin x (execute) kedalam program warm.
+
+Setelah mendapat akses execute, kita bisa menjalankannya dengan ./warm dan akan ada pemberitahuan kita bisa menggunakan -h untuk menampilkan opsi help pada program.
+Jalankan kembali dengan > ./warm -h untuk membuka opsi help dan kita mendapatkan flagnya di sana.
+
+## Tab, Tab, Attack
+    Diberikan file zip bernama Addadshashanammu.zip.
+Download dengan cara biasa.
+Ubah direktori saat ini ke home dengan cd /mnt/c/Users/LENOVO/Downloads (Dalam kasusku disini nama usernya adalah LENOVO).
+unzip menggunakan command > unzip Addadshashanammu.zip. Maka akan menampilkan file baru yang telah di create dan apa saja isinya.
+Kita mendapatkan file baru bernama fang-of-haynekhtnamet dan kita masih belum tahu file ini tipenya executable atau bukan, maka lihat jenis dengan command 
+> file Addadshashanammu/Almurbalarammi/Ashalmimilkala/Assurnabitashpi/Maelkashishi/Onnissiralis/Ularradallaku/fang-of-haynekhtnamet
+(terlihat bahwa file ini berjenis executable)
+
+Jalankan filenya dengan command 
+> /Addadshashanammu/Almurbalarammi/Ashalmimilkala/Assurnabitashpi/Maelkashishi/Onnissiralis/Ularradallaku/fang-of-haynekhtnamet
+Flag didapatkan.
+
+## Insp3ct0r
+    
+
+
+
+
 
