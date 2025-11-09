@@ -1,0 +1,106 @@
+Apa itu SSH?
+SSH (Secure Shell) adalah protokol jaringan untuk mengakses dan mengelola komputer/server jarak jauh secara aman. 
+SSH menyediakan koneksi terenkripsi sehingga kredensial dan data tidak dikirim dalam bentuk teks biasa. 
+Biasanya dipakai untuk remote shell, transfer file, dan tunneling port.
+
+Format dasar
+ssh user@host -p port
+
+user > nama user di mesin remote (contoh: ubuntu, root, kali).
+
+host > alamat IP atau domain mesin remote (contoh: 192.168.1.10 atau example.com).
+
+-p port → port SSH pada mesin remote (default SSH = 22). Jika server menggunakan port lain, pakai -p.
+
+Contoh:
+
+ssh kali@203.0.113.5 -p 2222
+
+Opsi SSH yang sering dipakai
+-p <port> : tentukan port SSH (contoh: -p 2222).
+-i /path/to/key : pakai private key tertentu (contoh: -i ~/.ssh/id_rsa_ctf).
+-v, -vv, -vvv : verbose mode (debug; bagus untuk troubleshooting).
+-C : aktifkan compression.
+-o Option=Value : set opsi konfigurasi satu baris (mis. -o StrictHostKeyChecking=no).
+
+Contoh pakai key dan verbose:
+ssh -i ~/.ssh/id_rsa -v kali@203.0.113.5 -p 2222
+
+Autentikasi: password vs key-based (disarankan)
+1. Password (default)
+
+SSH akan minta password user remote.
+
+2. Key-based (lebih aman & praktis)
+
+Langkah singkat:
+# 1) buat key di lokal (jika belum)
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_ctf -C "kali@laptop"
+
+# 2) copy public key ke remote (pakai port jika non-22)
+ssh-copy-id -i ~/.ssh/id_rsa_ctf.pub -p 2222 kali@203.0.113.5
+# atau manual:
+ssh -p 2222 user@203.0.113.5 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys' < ~/.ssh/id_rsa_ctf.pub
+
+Setelah ini, login:
+ssh -i ~/.ssh/id_rsa_ctf kali@203.0.113.5 -p 2222
+
+Catatan: pastikan permission:
+~/.ssh = 700
+~/.ssh/authorized_keys = 600
+
+SSH config (mempermudah)
+Isi file ~/.ssh/config untuk menyimpan opsi supaya tidak repot menulis -p dan -i tiap kali:
+Host myserver
+    HostName 203.0.113.5
+    User kali
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa_ctf
+    ServerAliveInterval 60
+
+Lalu cukup:
+ssh myserver
+Transfer file
+scp (secure copy)
+
+Perlu ingat: scp pakai -P (huruf besar) untuk port.
+
+# upload file ke server
+scp -P 2222 file.txt user@203.0.113.5:/home/kali/
+
+# download dari server
+scp -P 2222 kali@203.0.113.5:/home/user/flag.txt .
+
+sftp (interactive)
+sftp -P 2222 kali@203.0.113.5
+
+Port forwarding / tunneling (sangat berguna di CTF)
+Local port forwarding (akses service remote lewat port lokal)
+ssh -L <local_port>:<target_host>:<target_port> user@bastion -p <port>
+
+
+Contoh: akses web server internal 10.0.0.5:80 lewat localhost:8080:
+ssh -L 8080:10.0.0.5:80 kali@203.0.113.5 -p 2222
+# lalu buka http://localhost:8080 di browser
+
+Remote port forwarding (buat expose local ke remote)
+ssh -R <remote_port>:<local_host>:<local_port> user@remote -p <port>
+
+Dynamic port forwarding (SOCKS proxy)
+ssh -D 1080 user@203.0.113.5 -p 2222
+# lalu atur browser pakai SOCKS5 proxy localhost:1080
+
+Jump host / ProxyJump (mengakses host di private network)
+# langsung via bastion
+ssh -J bastionuser@bastion.example.com:2222 targetuser@10.0.0.5
+
+
+Atau di ~/.ssh/config:
+
+Host target
+    HostName 10.0.0.5
+    User targetuser
+    ProxyJump bastionuser@bastion.example.com:2222
+
+
+## Netcat
