@@ -78,7 +78,20 @@ Jalankan filenya dengan command
 Flag didapatkan.
 
 ## Insp3ct0r
-    
+
+> Inspeksi web pakai cntrl shiift i. Cari bagian html, css, js.
+
+## Strings it
+
+> strings strings | grep pico
+
+## First grep
+
+> Same as before.
+
+## Where are the robots
+
+> Tambahkan robots.txt pada ujung alamat web.
 
 
 
