@@ -1,0 +1,5 @@
+  Pendahuluan: Diberikan sebuah file pdf bernama confidential.pdf yang berisi teks, emji, dan teks yang dihitamkan. 
+Saat meng-copy paste teks yang dihitamkan, hanya terdapat teks default lorem ipsum biasa dan teks yang bukan flagnya.
+
+  Solusi: Cek metadata file confidential.pdf - kita dapat melihat bahwa author name dari file pdf ini aneh. Namun saat disubmit secara langsung, flag salah. 
+Kemungkinan flag diencode, dan encode yang memuat huruf dan karakter adalah base64. Gunakan command > echo "flag" | base64 -- decode.
