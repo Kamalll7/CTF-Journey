@@ -1,3 +1,5 @@
+  Tipe soal: Forensics.
+
   Pendahuluan: Diberikan sebuah file pdf bernama confidential.pdf yang berisi teks, emji, dan teks yang dihitamkan. 
 Saat meng-copy paste teks yang dihitamkan, hanya terdapat teks default lorem ipsum biasa dan teks yang bukan flagnya.
 
