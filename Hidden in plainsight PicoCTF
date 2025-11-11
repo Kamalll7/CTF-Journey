@@ -1,0 +1,9 @@
+  Tipe soal: Forensics (Image)
+
+  Pendahuluan: Diberikan sebuah image bernama img.jpg, saat dibuka langsung, hanya menampilkan gambar komputer tanpa petunjuk yang terlihat.
+
+  Solusi: Pertama, cek terlebih dahulu metadata dari img.jpg. Lalu didapatkan sebuah comment berisi rangkaian kombinasi acak. Decode ke base64 dan didapat hint yaitu steghide dan bagian kedua yang terencode.
+Decode base64 bagian kedua dan didapatlah password untuk steghide. Lalu pecahkan dengan menggunakan command
+> steghide extract -sf img.jpg
+> masukkan password yang didapat pada bagian kedua dari comment yang didecode.
+> didapat file flag.txt yang berisis flag ketika di cat.
