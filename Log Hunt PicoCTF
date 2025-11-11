@@ -1,0 +1,7 @@
+ Tipe soal: General skills.
+
+  Pendahuluan: Diberikan sebuah file server.log yang berisi log atau aktivitas server. Dari banyaknya log, terdapat log log yang memuat flag dengan indikasi "INFO FLAGPART:" yang
+tidak terurut dan menyebar dalam log.
+
+  Solusi: Karena kita tahu bahwa tiap part flag pasti memiliki indikasi "INFO FLAGPART:" maka kita bisa menggunakan grep.
+> grep "INFO FLAGPART:" server.log | sort -u
